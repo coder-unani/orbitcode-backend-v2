@@ -67,13 +67,12 @@ export function useNavData() {
         subheader: 'CONTENTS',
         items: [
           {
-            title: 'Management Video',
-            path: paths.dashboard.group.root,
+            title: '비디오 관리',
+            path: paths.content.root,
             icon: ICONS.user,
             children: [
-              { title: '비디오 리스트', path: paths.dashboard.group.root },
-              { title: 'five', path: paths.dashboard.group.five },
-              { title: 'six', path: paths.dashboard.group.six },
+              { title: '비디오 목록', path: paths.content.video.list },
+              { title: '순위', path: paths.content.video.ranking },
             ],
           },
           {

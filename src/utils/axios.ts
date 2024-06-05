@@ -36,7 +36,7 @@ export const endpoints = {
   // },
   auth: {
     login: '/v1/users/login',
-    me: '/api/auth/me',
+    me: '/v1/token',
     register: '/api/auth/register',
   },
   mail: {
@@ -54,5 +54,10 @@ export const endpoints = {
     list: '/api/product/list',
     details: '/api/product/details',
     search: '/api/product/search',
+  },
+  video: {
+    list: '/v1/admins/videos',
+    details: '/v1/contents/videos',
+    search: '/v1/admins/videos',
   },
 };

@@ -31,5 +31,15 @@ export const paths = {
     },
   },
   // CONTENT
-  content: {},
+  content: {
+    root: ROOTS.CONTENT,
+    video: {
+      root: `${ROOTS.CONTENT}/video`,
+      new: `${ROOTS.CONTENT}/video/new`,
+      list: `${ROOTS.CONTENT}/video/list`,
+      details: (id: string) => `${ROOTS.CONTENT}/video/${id}`,
+      edit: (id: string) => `${ROOTS.CONTENT}/video/${id}/edit`,
+      ranking: `${ROOTS.CONTENT}/video/ranking`,
+    },
+  },
 };
