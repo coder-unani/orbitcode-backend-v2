@@ -11,6 +11,7 @@ import { LoadingScreen } from 'src/components/loading-screen';
 const IndexPage = lazy(() => import('src/pages/dashboard/one'));
 
 const PageVideoList = lazy(() => import('src/pages/content/video/list'));
+const PageVideoDetail = lazy(() => import('src/pages/content/video/detail'));
 const PageVideoRanking = lazy(() => import('src/pages/content/video/ranking'));
 
 // ----------------------------------------------------------------------
@@ -34,6 +35,7 @@ export const contentRoutes = [
         children: [
           { element: <PageVideoList />, index: true },
           { path: 'list', element: <PageVideoList /> },
+          { path: ':id', element: <PageVideoDetail /> },
           { path: 'ranking', element: <PageVideoRanking /> },
         ],
       },

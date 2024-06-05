@@ -37,6 +37,17 @@ export type IStaff = {
   updated_at: string;
 };
 
+export type IReview = {
+  id: number;
+  user: string;
+  avatar: string;
+  comment: string;
+  rating: number;
+  isPurchased: boolean;
+  helpful: number;
+  postedAt: string;
+};
+
 export type IVideoWatch = {
   id: number;
   type: string;
@@ -64,6 +75,7 @@ export type IVideo = {
   rating: number;
   like_count: number;
   view_count: number;
+  review_count: number;
   platform_code: number;
   platform_id: number;
   genre: IGenre[];
@@ -71,6 +83,7 @@ export type IVideo = {
   staff: IStaff[];
   watch: IVideoWatch[];
   thumbnail: IVideoThumbnail[];
+  review: IReview[];
   created_at: string;
   updated_at: string;
 };
@@ -78,6 +91,8 @@ export type IVideo = {
 export type IVideoTableFilterValue = string | number | number | boolean | null;
 
 export type IVideoTableFilters = {
+  page: number;
+  pageSize: number;
   videoType: string;
   keyword: string | null;
   isConfirm: string;
@@ -88,6 +103,8 @@ export type IVideoTableFilters = {
 };
 
 export type IVideoApiParams = {
+  p: number;
+  ps: number;
   q: string | null;
   t: string | null;
   vid: number | null;

@@ -1,29 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import {
-  DataGrid,
-  GridColDef,
-  GridToolbarExport,
-  GridToolbarContainer,
-  GridRowSelectionModel,
-  GridColumnVisibilityModel,
-} from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridToolbarExport, GridToolbarContainer } from '@mui/x-data-grid';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
-import { useBoolean } from 'src/hooks/use-boolean';
-
 import { useSearchVideos } from 'src/api/video';
 import { VIDEO_TYPE_OPTIONS, VIDEO_ISDELETE_OPTIONS, VIDEO_ISCONFIRM_OPTIONS } from 'src/_mock';
 
 import Iconify from 'src/components/iconify';
-import { useSnackbar } from 'src/components/snackbar';
 import EmptyContent from 'src/components/empty-content';
 import { useSettingsContext } from 'src/components/settings';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
@@ -43,6 +33,8 @@ import {
 // ----------------------------------------------------------------------
 
 const defaultFilters: IVideoTableFilters = {
+  page: 1,
+  pageSize: 50,
   videoType: '10',
   keyword: '',
   isConfirm: 'false',
@@ -52,49 +44,39 @@ const defaultFilters: IVideoTableFilters = {
   orderBy: '',
 };
 
-const HIDE_COLUMNS = {
-  category: false,
-};
-
-const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
-
 // ----------------------------------------------------------------------
 
 export default function VideoListView() {
+  const router = useRouter();
+
   const [searchParams, setSearchParams] = useState<IVideoTableFilters>(defaultFilters);
-  // const [filters, setFilters] = useState(defaultFilters);
+  const [tableData, setTableData] = useState<IVideo[]>([]);
+
   const { searchResults, searchLoading } = useSearchVideos(searchParams);
 
   useEffect(() => {
-    if (searchResults.length) {
-      setTableData(searchResults);
-    } else {
-      setTableData([]);
-    }
+    setTableData(searchResults.list);
   }, [searchResults]);
 
+  const handleViewRow = useCallback(
+    (videoId: number) => {
+      router.push(paths.content.video.detail(videoId.toString()));
+    },
+    [router]
+  );
+
   const handleToolbarSubmit = (params: IVideoTableFilters) => {
-    setSearchParams(params);
+    setSearchParams((prev) => ({
+      ...prev,
+      videoType: params.videoType,
+      keyword: params.keyword,
+      isConfirm: params.isConfirm,
+      isDelete: params.isDelete,
+    }));
     console.log('call handleToolbarSubmit');
   };
 
-  const { enqueueSnackbar } = useSnackbar();
-
-  const confirmRows = useBoolean();
-  const router = useRouter();
   const settings = useSettingsContext();
-
-  const [tableData, setTableData] = useState<IVideo[]>([]);
-
-  const [selectedRowIds, setSelectedRowIds] = useState<GridRowSelectionModel>([]);
-
-  const [columnVisibilityModel, setColumnVisibilityModel] =
-    useState<GridColumnVisibilityModel>(HIDE_COLUMNS);
-
-  const dataFiltered = applyFilter({
-    inputData: tableData,
-    filters: searchParams,
-  });
 
   const columns: GridColDef[] = [
     {
@@ -191,18 +173,35 @@ export default function VideoListView() {
         <DataGrid
           checkboxSelection
           disableRowSelectionOnClick
-          rows={dataFiltered}
+          rows={tableData}
+          rowCount={searchResults.total}
           columns={columns}
           loading={searchLoading}
           getRowHeight={() => 'auto'}
+          pagination
+          paginationMode="server"
+          paginationModel={{
+            page: searchParams.page - 1,
+            pageSize: searchParams.pageSize,
+          }}
+          onPaginationModelChange={(newModel) => {
+            setSearchParams((prev) => ({
+              ...prev,
+              page: newModel.page >= 0 ? newModel.page + 1 : 0,
+              pageSize: newModel.pageSize,
+            }));
+          }}
           pageSizeOptions={[20, 50, 100]}
           initialState={{
             pagination: {
-              paginationModel: { pageSize: 50, page: 1 },
+              paginationModel: {
+                page: searchParams.page,
+                pageSize: searchParams.pageSize,
+              },
             },
           }}
-          onRowSelectionModelChange={(newSelectionModel) => {
-            setSelectedRowIds(newSelectionModel);
+          onCellClick={(params) => {
+            handleViewRow(params.row.id);
           }}
           slots={{
             toolbar: () => (
@@ -233,12 +232,4 @@ export default function VideoListView() {
       </Card>
     </Container>
   );
-}
-
-// ----------------------------------------------------------------------
-
-function applyFilter({ inputData, filters }: { inputData: IVideo[]; filters: IVideoTableFilters }) {
-  const { videoType, keyword } = filters;
-
-  return inputData;
 }

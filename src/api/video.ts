@@ -29,18 +29,18 @@ export function useGetVideos() {
 // ----------------------------------------------------------------------
 
 export function useGetVideo(videoId: string) {
-  const URL = videoId ? [endpoints.video.details, { params: { videoId } }] : '';
+  const URL = videoId ? `${endpoints.video.detail}/${videoId}` : '';
 
   const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
 
   const memoizedValue = useMemo(
     () => ({
-      video: data?.product as IVideo,
+      video: data?.data as IVideo,
       videoLoading: isLoading,
       videoError: error,
       videoValidating: isValidating,
     }),
-    [data?.product, error, isLoading, isValidating]
+    [data?.data, error, isLoading, isValidating]
   );
 
   return memoizedValue;
@@ -49,7 +49,10 @@ export function useGetVideo(videoId: string) {
 // ----------------------------------------------------------------------
 
 export function useSearchVideos(params: IVideoTableFilters) {
+  console.log('params', params);
   const searchParams: IVideoApiParams = {
+    p: params.page ? params.page : 1,
+    ps: params.pageSize ? params.pageSize : 50,
     q: params.keyword ? params.keyword : null,
     t: params.videoType ? params.videoType : null,
     vid: params.videoId ? params.videoId : null,
@@ -62,16 +65,16 @@ export function useSearchVideos(params: IVideoTableFilters) {
   const URL = params ? [endpoints.video.search, { params: searchParams }] : '';
 
   const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
-  console.log(data);
+
   const memoizedValue = useMemo(
     () => ({
-      searchResults: (data?.data as IVideo[]) || [],
+      searchResults: { total: data?.total, list: (data?.data as IVideo[]) || [] },
       searchLoading: isLoading,
       searchError: error,
       searchValidating: isValidating,
       searchEmpty: !isLoading && !data?.data,
     }),
-    [data?.data, error, isLoading, isValidating]
+    [data?.total, data?.data, error, isLoading, isValidating]
   );
 
   return memoizedValue;

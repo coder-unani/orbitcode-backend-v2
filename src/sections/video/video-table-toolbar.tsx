@@ -33,22 +33,17 @@ export default function VideoTableToolbar({
   videoIsConfirmOptions,
   videoIsDeleteOptions,
 }: Props) {
-  // const popover = usePopover();
-
   const [videoType, setVideoType] = useState<string>(params.videoType);
   const [keyword, setKeyword] = useState<string | null>(params.keyword);
   const [isConfirm, setIsConfirm] = useState<string>(params.isConfirm);
   const [isDelete, setIsDelete] = useState<string>(params.isDelete);
-  // const [videoId, setVideoId] = useState<number | null>(filters.videoId);
-  // const [platformId, setPlatformId] = useState<string | null>(filters.platformId);
-  // const [orderBy, setOrderBy] = useState<string | null>(filters.orderBy);
 
   const handleVideoTypeChange = useCallback((event: SelectChangeEvent<string>) => {
     setVideoType(event.target.value);
   }, []);
 
   const handleKeywordChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setKeyword(event.target.value);
+    setKeyword(event.currentTarget.value);
   }, []);
 
   const handleIsConfirmChange = useCallback((event: SelectChangeEvent<string>) => {
@@ -62,6 +57,8 @@ export default function VideoTableToolbar({
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const searchParams: IVideoTableFilters = { ...params };
+    console.log('params', params);
+    searchParams.page = 1;
     if (videoType) searchParams.videoType = videoType;
     if (keyword) searchParams.keyword = keyword;
     if (isConfirm) searchParams.isConfirm = isConfirm;

@@ -57,7 +57,7 @@ export const endpoints = {
   },
   video: {
     list: '/v1/admins/videos',
-    details: '/v1/contents/videos',
+    detail: '/v1/admins/videos',
     search: '/v1/admins/videos',
   },
 };
